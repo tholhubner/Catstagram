@@ -9,6 +9,9 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 16,
     fontWeight: "bold"
+  },
+  commentCountText: {
+    fontSize: 10,
   }
 })
 
