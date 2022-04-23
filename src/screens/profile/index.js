@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
-import { View, Text, Button } from 'react-native'
+import { View, Text, Button, Modal, TextInput } from 'react-native'
+import auth from "@react-native-firebase/auth"
+
+// local imports
+import baseStyles from "../../globals/baseStyles"
 
 class Profile extends Component {
   constructor(props) {
@@ -10,18 +14,25 @@ class Profile extends Component {
     }
   }
 
+  onSignOutPress = async () => {
+    auth().signOut()
+    this.props.navigation.navigate("Feed")
+  }
+
   render() {
     const { navigate } = this.props.navigation
+    const { container } = baseStyles
     return (
-      <View>
+      <View style={container}>
         <Text>Here is the profile screen</Text>
         <Button
-          onPress={() => navigate("Feed")}
-          title="Go to feed"
+          title="Sign Out"
+          onPress={() => this.onSignOutPress()}
+          color="red"
         />
-      </View>
+      </View> 
     )
   }
 }
 
-export default Profile;
+export default Profile
