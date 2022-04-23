@@ -13,11 +13,11 @@ class FeedItem extends Component {
 
   render() {
     const { post } = this.props
-    const { name, timestamp_created, comments } = post
+    const { name, timestamp_created, comments, image } = post
     const { feedItemContainer } = styles
     return (
       <TouchableOpacity style={feedItemContainer} onPress={() => this.props.onItemSelected(post)}>
-        <FeedImageView imageUri={"https://reactnative.dev/img/tiny_logo.png"} /> // TODO: Switch to real url
+        <FeedImageView imageUri={`http://catstagram.lofty.codes/media/${image}`} />
         <FeedHeaderText text={name} />
         <FeedItemDate timestamp={timestamp_created} />
         <FeedCommentCount comments={comments} />

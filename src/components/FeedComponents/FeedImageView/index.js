@@ -10,12 +10,12 @@ class FeedImageView extends Component {
   }
 
   render() {
-    const { imageUri } = this.props
-    const { imageContainer, imageStyle } = styles
+    const { imageUri, full } = this.props
+    const { imageContainer, imageStyleFull, imageStyleSmall } = styles
     return (
       <View style={imageContainer} testID="ImageView">
         <Image
-          style={imageStyle}
+          style={full ? imageStyleFull : imageStyleSmall}
           source={{
             uri: imageUri
           }}
