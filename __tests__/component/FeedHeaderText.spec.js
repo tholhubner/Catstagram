@@ -1,6 +1,6 @@
 import React from "react"
 import {render} from "@testing-library/react-native"
-import { FeedHeaderText } from "../src/components/FeedComponents"
+import { FeedHeaderText } from "../../src/components/FeedComponents"
 
 describe("FeedHeaderText", () => {
   it("displays text value passed in", () => {

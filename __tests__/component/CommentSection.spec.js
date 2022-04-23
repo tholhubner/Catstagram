@@ -1,6 +1,6 @@
 import React from "react"
 import {render} from "@testing-library/react-native"
-import CommentSection from "../src/components/CommentSection"
+import CommentSection from "../../src/components/CommentSection"
 
 describe("CommentSection", () => {
   it("should display 4 comments", () => {

@@ -1,6 +1,6 @@
 import React from "react"
 import {render} from "@testing-library/react-native"
-import { FeedImageView } from "../src/components/FeedComponents"
+import { FeedImageView } from "../../src/components/FeedComponents"
 
 describe("FeedImageView", () => {
   it("image displays to user", () => {

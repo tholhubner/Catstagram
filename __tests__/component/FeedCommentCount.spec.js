@@ -1,6 +1,6 @@
 import React from "react"
 import {render} from "@testing-library/react-native"
-import { FeedCommentCount } from "../src/components/FeedComponents"
+import { FeedCommentCount } from "../../src/components/FeedComponents"
 
 describe("FeedCommentCount", () => {
   it("displays a comment count of 3", () => {

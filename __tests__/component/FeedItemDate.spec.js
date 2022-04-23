@@ -1,6 +1,6 @@
 import React from "react"
 import {render} from "@testing-library/react-native"
-import { FeedItemDate } from "../src/components/FeedComponents"
+import { FeedItemDate } from "../../src/components/FeedComponents"
 
 describe("FeedDateItem", () => {
   it("formats date correctly for display", () => {
