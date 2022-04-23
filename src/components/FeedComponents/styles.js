@@ -12,6 +12,14 @@ const styles = StyleSheet.create({
   },
   commentCountText: {
     fontSize: 10,
+  },
+  imageStyle: {
+    width: 300,
+    height: 300,
+    marginBottom: 10
+  },
+  imageContainer: {
+    alignItems: "center"
   }
 })
 
