@@ -36,12 +36,14 @@ class PostView extends Component {
     const { comments } = this.state
     const { container } = baseStyles
     return (
-      <ScrollView style={container}>
+      <View style={container}>
         <FeedHeaderText text={name} />
         <FeedImageView imageUri={`http://catstagram.lofty.codes/media/${image}`} full />
-        <CommentSection comments={comments} />
         <NewComment onAddCommentPressed={this.onAddCommentPressed} />
-      </ScrollView>
+        <ScrollView>
+          <CommentSection comments={comments} />
+        </ScrollView>
+      </View>
     )
   }
 }

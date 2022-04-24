@@ -23,10 +23,6 @@ class Feed extends Component {
   handleAddPhotoPress = () => {
     this.setState({ addModalVisible: true })
   }
-  
-  handleImageSelection = (photoUri) => {
-    console.log(photoUri)
-  }
 
   // Render the feed to the user
   // Also handles the modal logic for adding a photo
@@ -35,26 +31,28 @@ class Feed extends Component {
     const { posts, addModalVisible } = this.state
     const { catView } = styles
     return (
-      <View>
-        <ScrollView style={catView}>
-          <View>
-            {posts.map((item, index) => (
-              <FeedItem key={index} post={item} onItemSelected={onItemSelected} />
-            ))}
-          </View>
-        </ScrollView>
-        <AddPhotoButton handleAddPhotoPress={() => this.setState({ addModalVisible: true })} />
+      <>
+        <View>
+          <ScrollView style={catView}>
+            <View>
+              {posts.map((item, index) => (
+                <FeedItem key={index} post={item} onItemSelected={onItemSelected} />
+              ))}
+            </View>
+          </ScrollView>
+          <AddPhotoButton handleAddPhotoPress={() => this.setState({ addModalVisible: true })} />
+        </View>
 
         <Modal
-          animationType="slide"
-          visible={addModalVisible}
-          onRequestClose={() => {
-            setModalVisible(!addModalVisible);
-          }}
-        >
-          <AddPhoto handleClosePress={() => this.setState({ addModalVisible: false })} handleImagePress={() => this.handleImageSelection()} />
+            animationType="slide"
+            visible={addModalVisible}
+            onRequestClose={() => {
+              setModalVisible(!addModalVisible);
+            }}
+          >
+            <AddPhoto handleClosePress={() => this.setState({ addModalVisible: false })} handleImagePress={() => this.handleImageSelection()} />
         </Modal>
-      </View>
+      </>
     )
   }
 }

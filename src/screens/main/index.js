@@ -35,12 +35,12 @@ class Main extends Component {
 
   // Get the feed in an async method
   getCatFeed = async () => {
-    // const feedRes = await getFeed()
-    // if (feedRes.length > 0) {
-    //   this.setState({ posts: feedRes })
-    // } else {
-    //   this.setState({ feedError: feedRes })
-    // }
+    const feedRes = await getFeed()
+    if (feedRes.length > 0) {
+      this.setState({ posts: feedRes })
+    } else {
+      this.setState({ feedError: feedRes })
+    }
   }
 
   // Function for handling a feed item being selected, send user to post view

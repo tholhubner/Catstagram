@@ -33,6 +33,7 @@ class NewComment extends Component {
           placeholder="Add a comment..."
           onChangeText={(value) => this.setState({ newCommentText: value})}
           testID="commentBox"
+          onEndEditing={() => this.onButtonPressed()}
         />
         <View style={buttonContainer}>
           <Button title="Add" color="#9042f5" onPress={() => this.onButtonPressed()} />
