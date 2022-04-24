@@ -20,6 +20,7 @@ class PostView extends Component {
     }
   }
 
+  // Handle comment "add" button press and call addComment function to add this to state
   onAddCommentPressed = (newCommentText) => {
     const { comments } = this.state
     if (newCommentText) {
@@ -28,6 +29,8 @@ class PostView extends Component {
     }
   }
 
+  // Render the Post with its name, image and comments
+  // Also render new comment section for users to add new comments to the post
   render() {
     const { name, image } = this.props.route.params.post
     const { comments } = this.state
