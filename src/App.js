@@ -14,14 +14,10 @@ const CatStack = createNativeStackNavigator()
 class App extends Component {
   constructor(props) {
     super(props)
-
-    this.state = {
-      user: null
-    }
   }
 
+  // Adds screens needed for navigation in the app
   render() {
-    const { user } = this.state
     return (
       <NavigationContainer>
         <CatStack.Navigator>
