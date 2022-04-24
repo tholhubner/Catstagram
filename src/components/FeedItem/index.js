@@ -16,7 +16,7 @@ class FeedItem extends Component {
     const { name, timestamp_created, comments, image } = post
     const { feedItemContainer } = styles
     return (
-      <TouchableOpacity style={feedItemContainer} onPress={() => this.props.onItemSelected(post)}>
+      <TouchableOpacity style={feedItemContainer} onPress={() => this.props.onItemSelected(post)} testID="feedItem">
         <FeedImageView imageUri={`http://catstagram.lofty.codes/media/${image}`} />
         <FeedHeaderText text={name} />
         <FeedItemDate timestamp={timestamp_created} />
