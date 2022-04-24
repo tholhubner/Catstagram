@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { View, Button, TextInput } from "react-native"
+import { View, TextInput } from "react-native"
 
 // local imports
 import baseStyles from "../../globals/baseStyles"
@@ -35,9 +35,6 @@ class NewComment extends Component {
           testID="commentBox"
           onEndEditing={() => this.onButtonPressed()}
         />
-        <View style={buttonContainer}>
-          <Button title="Add" color="#9042f5" onPress={() => this.onButtonPressed()} />
-        </View>
       </View>
     )
   }
