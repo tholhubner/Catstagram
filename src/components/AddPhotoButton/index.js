@@ -10,6 +10,7 @@ class AddPhotoButton extends Component {
     super(props)
   }
 
+  // Renders the add photo button, this is positioned absolutely on the feed page 
   render() {
     const { handleAddPhotoPress } = this.props
     const { addText, addButtonStyle } = styles

@@ -9,6 +9,8 @@ class FeedImageView extends Component {
     super(props)
   }
 
+  // Renders the provided image URI
+  // Accepts the "full" prop which will change the size for post view or the feed
   render() {
     const { imageUri, full } = this.props
     const { imageContainer, imageStyleFull, imageStyleSmall } = styles

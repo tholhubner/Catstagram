@@ -10,6 +10,7 @@ class FeedItemDate extends Component {
     super(props)
   }
 
+  // Renders the date provided as "Posted on Sat, April 21st 2022"
   render() {
     const { timestamp } = this.props
     return (

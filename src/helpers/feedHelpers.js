@@ -1,5 +1,6 @@
 import moment from "moment"
 
+// makes a fetch request to get the current feed from the LOFTY api
 export async function getFeed() {
   let results = fetch("http://catstagram.lofty.codes/api/posts/", { timeout: 5000 })
     .then(async (response) => {
@@ -13,6 +14,7 @@ export async function getFeed() {
   return results
 }
 
+// adds a comment to the existing array and returns it
 export function addComment(comments, newComment) {
   const newArray = comments
   const commentLength = comments.length

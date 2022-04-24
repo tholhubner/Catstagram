@@ -17,6 +17,7 @@ class CommentSection extends Component {
     }
   }
 
+  // Renders the supplied comment array with a formatted timestamp
   render() {
     const { comments } = this.state
     const { container, commentHeader, commentText, commentTimestamp } = styles

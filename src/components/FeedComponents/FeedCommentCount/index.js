@@ -9,6 +9,7 @@ class FeedCommentCount extends Component {
     super(props)
   }
 
+  // Displays the number of comments on a particular post as "Comments (X)"
   render() {
     const { comments } = this.props
     const { commentCountText } = styles
