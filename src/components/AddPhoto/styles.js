@@ -2,10 +2,9 @@ import React from 'react'
 import { StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
-  catView: {
-    height: "100%",
-    width: "100%",
-  }
+  container: {
+    marginTop: 60,
+  },
 })
 
 export default styles

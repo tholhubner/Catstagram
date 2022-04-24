@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 16,
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   commentCountText: {
     fontSize: 10,
@@ -16,16 +16,16 @@ const styles = StyleSheet.create({
   imageStyleSmall: {
     width: 300,
     height: 300,
-    marginBottom: 10
+    marginBottom: 10,
   },
   imageStyleFull: {
     width: 350,
     height: 350,
-    margin: 10
+    margin: 10,
   },
   imageContainer: {
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 })
 
 export default styles

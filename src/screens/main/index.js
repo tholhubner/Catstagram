@@ -3,7 +3,6 @@ import { View, Modal } from "react-native"
 
 // local imports
 import baseStyles from "../../globals/baseStyles"
-import styles from "./styles"
 import { getFeed } from "../../helpers/feedHelpers"
 import Feed from "../../components/Feed"
 import { checkUserStatus } from "../../helpers/authHelpers"
@@ -27,7 +26,6 @@ class Main extends Component {
   // Call the checkUserStatus function to see if there is a user logged in or not
   checkUser = async () => {
     const userStatus = await checkUserStatus()
-    console.log(userStatus)
     if (!userStatus) {
       this.setState({ signUpVisible: true })
     } else {
@@ -37,13 +35,12 @@ class Main extends Component {
 
   // Get the feed in an async method
   getCatFeed = async () => {
-    const feedRes = await getFeed()
-    console.log(feedRes[0].name)
-    if (feedRes.length > 0) {
-      this.setState({ posts: feedRes })
-    } else {
-      this.setState({ feedError: feedRes })
-    }
+    // const feedRes = await getFeed()
+    // if (feedRes.length > 0) {
+    //   this.setState({ posts: feedRes })
+    // } else {
+    //   this.setState({ feedError: feedRes })
+    // }
   }
 
   // Function for handling a feed item being selected, send user to post view
@@ -67,7 +64,6 @@ class Main extends Component {
     return (
       <View style={container}>
         <Feed posts={posts} onItemSelected={this.onFeedItemSelected} />
-
         <Modal
           animationType="slide"
           visible={signUpVisible}
