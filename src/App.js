@@ -17,6 +17,7 @@ class App extends Component {
   }
 
   // Adds screens needed for navigation in the app
+  // Use name to reference these routes in other places in the app
   render() {
     return (
       <NavigationContainer>
