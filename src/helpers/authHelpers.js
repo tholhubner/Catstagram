@@ -31,7 +31,6 @@ export async function userSignUp(email, password) {
 // Checks whether or not a user is currently signed into the app
 export async function checkUserStatus() {
   const user = await auth().currentUser
-  console.log(user)
   if (user) {
     return true
   } else {

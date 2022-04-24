@@ -25,7 +25,6 @@ class Signup extends Component {
         this.setState({ signUpError: null })
       }
       const results = await userSignUp(email, password)
-      console.log("Heyo :: ", results)
       if (results === "success") {
         Alert.alert("Signed in!")
         requestModalClose()
