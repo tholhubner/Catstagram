@@ -1,5 +1,6 @@
 import auth from "@react-native-firebase/auth"
 
+// Signs a user up through Firebase with an email and a password provided
 export async function userSignUp(email, password) {
   const results = auth()
     .createUserWithEmailAndPassword(email, password)
@@ -25,4 +26,15 @@ export async function userSignUp(email, password) {
       return signUpError
     })
   return results
+}
+
+// Checks whether or not a user is currently signed into the app
+export async function checkUserStatus() {
+  const user = await auth().currentUser
+  console.log(user)
+  if (user) {
+    return true
+  } else {
+    return false
+  }
 }
