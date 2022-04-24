@@ -4,7 +4,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
 // local imports
 import Main from './screens/main'
-import Profile from "./screens/profile"
 import PostView from "./screens/postview"
 
 const CatStack = createNativeStackNavigator()
@@ -21,7 +20,6 @@ class App extends Component {
       <NavigationContainer>
         <CatStack.Navigator>
           <CatStack.Screen name="Main" component={Main} />
-          <CatStack.Screen name="Profile" component={Profile} />
           <CatStack.Screen name="PostView" component={PostView} />
         </CatStack.Navigator>
       </NavigationContainer>
