@@ -14,7 +14,7 @@ describe("NewComment", () => {
     const { getByTestId, getByText } = render(<NewComment onAddCommentPressed={() => {}} />)
 
     fireEvent.changeText(getByTestId("commentBox"), "Pawsome!")
-    fireEvent.press(getByText("Add"))
+    fireEvent(getByTestId("commentBox"), 'endEditing')
 
     expect(getByTestId("commentBox")).toHaveProp("value", null)
   })
