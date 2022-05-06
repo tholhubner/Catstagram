@@ -131,6 +131,10 @@ jobs:
             bundle exec fastlane test
             mv fastlane/report.xml test-results/fastlane
 
+      - run:
+          name: fastlane upload_testfairy
+          command: bundle exec fastlane upload_testfairy
+
       - store_test_results:
           path: test-results
 
