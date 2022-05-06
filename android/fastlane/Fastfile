@@ -17,8 +17,9 @@ default_platform(:android)
 
 platform :android do
   desc "Run the test"
-  lane :test do
-    gradle(task: "test")
+    lane :test do
+      gradle(task: "test")
+    end
   end
 
   desc "Upload test build to Testfairy"
