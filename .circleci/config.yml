@@ -1,169 +1,157 @@
 version: 2.1
 jobs:
-  build:
-    working_directory: ~/code
+  node:
+    working_directory: ~/Catstagram
     docker:
-      - image: cimg/python:3.8
+      - image: cimg/node:12.16
+
     steps:
       - checkout
-      - run:
-          name: Install Python deps in a venv
-          command: |
-            sudo apt-get --allow-releaseinfo-change-suite update
-            python -m venv venv
-            . venv/bin/activate
-            pip install -r backend/requirements.txt
+
+      - restore_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+
+      - restore_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+
+      - run: yarn install
+
       - save_cache:
-              key: v1-{{ checksum "backend/requirements.txt" }}
-              paths:
-                - 'venv'
-      - persist_to_workspace:
-              root: .
-              paths:
-                - .
-  test:
-    docker:
-      - image: cimg/python:3.8
-      - image: cimg/postgres:13.4
-        name: postgres
-        environment:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-    working_directory: ~/code
-    steps:
-      - attach_workspace:
-          at: ~/code
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+          paths:
+            - ~/.cache/yarn
+
+      - save_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+          paths:
+            - node_modules
+
       - run:
-          name: Run Unit Tests
+          name: jest tests
           command: |
-            sudo apt-get --allow-releaseinfo-change-suite update
-            python -m venv venv
-            . venv/bin/activate
-            pip install -r backend/requirements.txt
-            cd backend
-            python manage.py test
+            mkdir -p test-results/jest
+            yarn run test
           environment:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: postgres
-            DEBUG: "True"
-            SECRET_KEY: SECRET_KEY
-            DOMAIN: http://localhost:8000
-            ALLOWED_HOSTS: '*'
-            CORS_ORIGIN_ALLOW_ALL: "True"
-            LOCAL_HOST: "True"
-  build_image:
-    docker:
-      - image: cimg/python:3.8
-    working_directory: ~/code
-    steps:
-      - setup_remote_docker:
-          docker_layer_caching: false
-      - attach_workspace:
-          at: ~/code
-      - restore_cache:
-          key: v1-{{ checksum "requirements.txt" }}
-      - run:
-          name: Build Image and push to ECR
-          command: |
-            . venv/bin/activate
-            pip install awscli
-            aws configure set aws_access_key_id  $AWS_ACCESS_KEY_ID
-            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-            aws configure set default.region $REGION
-            aws configure set default.output json
-            $(aws ecr get-login --no-include-email --region $REGION)
-            cd backend
-            docker build -t $TAG_NAME -f Dockerfile .
-            docker tag $TAG_NAME:latest $ECR_LOCATION/$TAG_NAME:$CIRCLE_SHA1
-            docker push $ECR_LOCATION/$TAG_NAME:$CIRCLE_SHA1
-  deploy-staging:
-    docker:
-      - image: rancher/cli2:v2.6.0
-    working_directory: ~/code
+            JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
+
+      - persist_to_workspace:
+          root: ~/Catstagram
+          paths:
+            - node_modules
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-results
+
+  macos-build-and-test:
+    working_directory: ~/Catstagram
+    macos:
+      xcode: 11.3.0
+    environment:
+      FL_OUTPUT_DIR: output
+      FASTLANE_LANE: test
+
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/code
       - restore_cache:
-          key: v1-{{ checksum "backend/requirements.txt" }}
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+
+      - restore_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+
+      - run: yarn install
+
+      - save_cache:
+          key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
+          paths:
+            - ~/.cache/yarn
+
+      - save_cache:
+          key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+          paths:
+            - node_modules
+
+      - restore_cache:
+          key: bundle-v1-{{ checksum "ios/Gemfile.lock" }}-{{ arch }}
+
+      #Pods directory is ignored to match default RN setup, but can also check them into source control
+      #https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
+      - restore_cache:
+          key: pods-v1-{{ checksum "ios/Podfile.lock" }}-{{ arch }}
+
+      - run: 
+          command: pod install
+          working_directory: ios
+
+      - run: 
+          command: bundle install
+          working_directory: ios
+
+      - save_cache:
+          key: bundle-v1-{{ checksum "ios/Gemfile.lock" }}-{{ arch }}
+          paths:
+            - vendor/bundle
+
+      - save_cache:
+          key: pods-v1-{{ checksum "ios/Podfile.lock" }}-{{ arch }}
+          paths:
+            - ios/Pods
+
       - run:
-          name: Install Kubectl
-          command: |
-            apk update
-            apk add curl
-            apk add jq
-            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-            chmod +x ./kubectl
-            mv ./kubectl /usr/local/bin/kubectl
-          environment:
-            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-            AWS_SECRET_ACCESS_KEY:  $AWS_SECRET_ACCESS_KEY
-            AWS_DEFAULT_REGION: $REGION
+          name: Fastlane
+          command: bundle exec fastlane $FASTLANE_LANE
+          working_directory: ios
+
+      - store_artifacts:
+          path: output
+          
+      - store_test_results:
+          path: output/scan
+            
+  android-build-and-test:
+    working_directory: ~/Catstagram/android
+    docker:
+      - image: circleci/android:api-29-node
+    steps:
+      - checkout:
+          path: ~/Catstagram
+
+      - attach_workspace:
+          at: ~/Catstagram
+
+      - restore_cache:
+          key: bundle-v1-{{ checksum "Gemfile.lock" }}-{{ arch }}
+
+      - run: bundle install
+
+      - save_cache:
+          key: bundle-v1-{{ checksum "Gemfile.lock" }}-{{ arch }}
+          paths:
+            - vendor/bundle
+
       - run:
-          name: Deploy to Kubernetes
+          name: fastlane tests
           command: |
-            rancher login $RANCHER_LOGIN --token $RANCHER_BEARER_TOKEN --context $CONTEXT --skip-verify
-            rancher kubectl set image deployment $POD_NAME_STAGE $CONTAINER_NAME_STAGE=$ECR_LOCATION/$TAG_NAME:$CIRCLE_SHA1 --namespace $RANCHER_NAMESPACE_STAGE  --insecure-skip-tls-verify
-  deploy-prod:
-      docker:
-        - image: rancher/cli2:v2.6.0
-      working_directory: ~/code
-      steps:
-        - checkout
-        - attach_workspace:
-            at: ~/code
-        - restore_cache:
-            key: v1-{{ checksum "backend/requirements.txt" }}
-        - run:
-            name: Install Kubectl
-            command: |
-              apk update
-              apk add curl
-              apk add jq
-              curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-              chmod +x ./kubectl
-              mv ./kubectl /usr/local/bin/kubectl
-            environment:
-              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-              AWS_SECRET_ACCESS_KEY:  $AWS_SECRET_ACCESS_KEY
-              AWS_DEFAULT_REGION: $REGION
-        - run:
-            name: Deploy to Kubernetes
-            command: |
-              rancher login $RANCHER_LOGIN --token $RANCHER_BEARER_TOKEN --context $CONTEXT --skip-verify
-              rancher kubectl set image deployment $POD_NAME_PROD $CONTAINER_NAME_PROD=$ECR_LOCATION/$TAG_NAME:$CIRCLE_SHA1 --namespace $RANCHER_NAMESPACE_PROD  --insecure-skip-tls-verify
+            mkdir -p test-results/fastlane
+            bundle exec fastlane test
+            mv fastlane/report.xml test-results/fastlane
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-results
+
 workflows:
-  version: 2
-  build-test-deploy:
+  node-android-ios:
     jobs:
-      - build
-      - test:
+      - node
+      - android-build-and-test:
           requires:
-             - build
-      - build_image:
+            - node
+      - macos-build-and-test:
           requires:
-            - build
-            - test
-          filters:
-            branches:
-              only:
-                # - development
-                - main
-      # - deploy-staging:
-      #     requires:
-      #       - build
-      #       - test
-      #       - build_image
-      #     filters:
-      #       branches:
-      #         only: development
-      - deploy-prod:
-          requires:
-            - build
-            - test
-            - build_image
-          filters:
-            branches:
-              only: main
+            - node
+            
