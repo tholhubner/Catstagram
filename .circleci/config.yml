@@ -105,11 +105,12 @@ jobs:
     docker:
       - image: cimg/android:2022.04.1-node
     steps:
+      - checkout:
+          path: ~/Catstagram
+          
       - run:
           name: Set Ruby Version
           command: echo "ruby-2.7" > ~/.ruby-version
-      - checkout:
-          path: ~/Catstagram
 
       - attach_workspace:
           at: ~/Catstagram
