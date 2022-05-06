@@ -54,6 +54,8 @@ jobs:
       FASTLANE_LANE: test
 
     steps:
+      - macos/switch-ruby:
+          version: "2.7.0"
       - checkout
       - restore_cache:
           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
