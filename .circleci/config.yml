@@ -1,0 +1,169 @@
+version: 2.1
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: cimg/python:3.8
+    steps:
+      - checkout
+      - run:
+          name: Install Python deps in a venv
+          command: |
+            sudo apt-get --allow-releaseinfo-change-suite update
+            python -m venv venv
+            . venv/bin/activate
+            pip install -r backend/requirements.txt
+      - save_cache:
+              key: v1-{{ checksum "backend/requirements.txt" }}
+              paths:
+                - 'venv'
+      - persist_to_workspace:
+              root: .
+              paths:
+                - .
+  test:
+    docker:
+      - image: cimg/python:3.8
+      - image: cimg/postgres:13.4
+        name: postgres
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+    working_directory: ~/code
+    steps:
+      - attach_workspace:
+          at: ~/code
+      - run:
+          name: Run Unit Tests
+          command: |
+            sudo apt-get --allow-releaseinfo-change-suite update
+            python -m venv venv
+            . venv/bin/activate
+            pip install -r backend/requirements.txt
+            cd backend
+            python manage.py test
+          environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: postgres
+            DEBUG: "True"
+            SECRET_KEY: SECRET_KEY
+            DOMAIN: http://localhost:8000
+            ALLOWED_HOSTS: '*'
+            CORS_ORIGIN_ALLOW_ALL: "True"
+            LOCAL_HOST: "True"
+  build_image:
+    docker:
+      - image: cimg/python:3.8
+    working_directory: ~/code
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - attach_workspace:
+          at: ~/code
+      - restore_cache:
+          key: v1-{{ checksum "requirements.txt" }}
+      - run:
+          name: Build Image and push to ECR
+          command: |
+            . venv/bin/activate
+            pip install awscli
+            aws configure set aws_access_key_id  $AWS_ACCESS_KEY_ID
+            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            aws configure set default.region $REGION
+            aws configure set default.output json
+            $(aws ecr get-login --no-include-email --region $REGION)
+            cd backend
+            docker build -t $TAG_NAME -f Dockerfile .
+            docker tag $TAG_NAME:latest $ECR_LOCATION/$TAG_NAME:$CIRCLE_SHA1
+            docker push $ECR_LOCATION/$TAG_NAME:$CIRCLE_SHA1
+  deploy-staging:
+    docker:
+      - image: rancher/cli2:v2.6.0
+    working_directory: ~/code
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/code
+      - restore_cache:
+          key: v1-{{ checksum "backend/requirements.txt" }}
+      - run:
+          name: Install Kubectl
+          command: |
+            apk update
+            apk add curl
+            apk add jq
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            mv ./kubectl /usr/local/bin/kubectl
+          environment:
+            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY:  $AWS_SECRET_ACCESS_KEY
+            AWS_DEFAULT_REGION: $REGION
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            rancher login $RANCHER_LOGIN --token $RANCHER_BEARER_TOKEN --context $CONTEXT --skip-verify
+            rancher kubectl set image deployment $POD_NAME_STAGE $CONTAINER_NAME_STAGE=$ECR_LOCATION/$TAG_NAME:$CIRCLE_SHA1 --namespace $RANCHER_NAMESPACE_STAGE  --insecure-skip-tls-verify
+  deploy-prod:
+      docker:
+        - image: rancher/cli2:v2.6.0
+      working_directory: ~/code
+      steps:
+        - checkout
+        - attach_workspace:
+            at: ~/code
+        - restore_cache:
+            key: v1-{{ checksum "backend/requirements.txt" }}
+        - run:
+            name: Install Kubectl
+            command: |
+              apk update
+              apk add curl
+              apk add jq
+              curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+              chmod +x ./kubectl
+              mv ./kubectl /usr/local/bin/kubectl
+            environment:
+              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY:  $AWS_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION: $REGION
+        - run:
+            name: Deploy to Kubernetes
+            command: |
+              rancher login $RANCHER_LOGIN --token $RANCHER_BEARER_TOKEN --context $CONTEXT --skip-verify
+              rancher kubectl set image deployment $POD_NAME_PROD $CONTAINER_NAME_PROD=$ECR_LOCATION/$TAG_NAME:$CIRCLE_SHA1 --namespace $RANCHER_NAMESPACE_PROD  --insecure-skip-tls-verify
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+             - build
+      - build_image:
+          requires:
+            - build
+            - test
+          filters:
+            branches:
+              only:
+                # - development
+                - main
+      # - deploy-staging:
+      #     requires:
+      #       - build
+      #       - test
+      #       - build_image
+      #     filters:
+      #       branches:
+      #         only: development
+      - deploy-prod:
+          requires:
+            - build
+            - test
+            - build_image
+          filters:
+            branches:
+              only: main
