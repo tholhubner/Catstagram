@@ -54,9 +54,6 @@ jobs:
       FASTLANE_LANE: test
 
     steps:
-      - run:
-          name: Set Ruby Version
-          command: sed -i '' 's/^chruby.*/chruby ruby-2.7.0/g' ~/.bash_profile
       - checkout
       - restore_cache:
           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
