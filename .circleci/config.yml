@@ -3,7 +3,7 @@ jobs:
   node:
     working_directory: ~/Catstagram
     docker:
-      - image: cimg/node:12.16
+      - image: cimg/node:18.0
 
     steps:
       - checkout
@@ -14,7 +14,7 @@ jobs:
       - restore_cache:
           key: node-v1-{{ checksum "package.json" }}-{{ arch }}
 
-      - run: yarn install
+      - run: npm i --legacy-peer-deps
 
       - save_cache:
           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
@@ -48,7 +48,7 @@ jobs:
   macos-build-and-test:
     working_directory: ~/Catstagram
     macos:
-      xcode: 11.3.0
+      xcode: 13.3.1
     environment:
       FL_OUTPUT_DIR: output
       FASTLANE_LANE: test
