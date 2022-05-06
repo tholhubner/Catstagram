@@ -100,7 +100,7 @@ jobs:
   android-build:
     working_directory: ~/Catstagram/android
     docker:
-      - image: android:2022.01.1
+      - image: cimg/android:2022.04.1-node
     steps:
       - checkout:
           path: ~/Catstagram
