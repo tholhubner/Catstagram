@@ -100,7 +100,7 @@ jobs:
   android-build:
     working_directory: ~/Catstagram/android
     docker:
-      - image: circleci/android:api-29-node
+      - image: circleci/android:2022.01.1
     steps:
       - checkout:
           path: ~/Catstagram
