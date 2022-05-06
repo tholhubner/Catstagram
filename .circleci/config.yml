@@ -47,14 +47,16 @@ jobs:
 
   ios-build:
     working_directory: ~/Catstagram
-    macos: circleci/macos@2
+    macos:
+      xcode: 13.3.1
     environment:
       FL_OUTPUT_DIR: output
       FASTLANE_LANE: test
 
     steps:
-      - macos/switch-ruby:
-          version: "2.7.0"
+      - run:
+          name: Set Ruby Version
+          command: sed -i '' 's/^chruby.*/chruby ruby-2.7.0/g' ~/.bash_profile
       - checkout
       - restore_cache:
           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
