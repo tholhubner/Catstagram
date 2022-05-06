@@ -56,7 +56,7 @@ jobs:
     steps:
       - run:
           name: Set Ruby Version
-          command: echo 'chruby ruby-2.7.0' >> ~/.bash_profile
+          command: echo 'chruby ruby-2.7' >> ~/.bash_profile
       - checkout
       - restore_cache:
           key: yarn-v1-{{ checksum "yarn.lock" }}-{{ arch }}
