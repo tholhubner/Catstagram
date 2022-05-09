@@ -133,7 +133,7 @@ jobs:
       
       - run:
           name: Bundle release
-          command: "cd android/; ./gradlew assembleRelease; .."
+          command: "./gradlew assembleRelease"
 
       - run:
           name: fastlane upload_testfairy
