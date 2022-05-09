@@ -137,7 +137,7 @@ jobs:
 
       - run:
           name: fastlane upload_testfairy
-          command: bundle exec fastlane upload_testfairy
+          command: bundle exec fastlane env; bundle exec fastlane upload_testfairy
 
       - store_test_results:
           path: test-results
